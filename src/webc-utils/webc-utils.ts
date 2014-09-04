@@ -8,6 +8,6 @@ export module webc_utils {
 
 // Export module
 declare var define:any;
-try { define('webc_utils', function () { return webc_utils; }); } catch (e) {
-    try { window['webc_utils'] = webc_utils; } catch(e) {}
+try { define('webc-utils', function () { return webc_utils; }); } catch (e) {
+    try { window['webc-utils'] = webc_utils; } catch(e) {}
 }
