@@ -54,7 +54,7 @@ module.exports = function (grunt) {
     ext.configure({
         watch: {
             lib: {
-                files: ['src/webc/**/*.ts'],
+                files: ['src/webc-utils/**/*.ts'],
                 tasks: ['_lib'],
                 options: {
                     spawn: true

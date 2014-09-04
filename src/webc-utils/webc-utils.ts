@@ -1,8 +1,10 @@
+import api = require('./api');
+
 export module webc_utils {
 
-  /** Get first matching child element */
-  export function get_element(tag:string):any {
-    return {}
+  /** Generate a new api for the given element */
+  export function $(root:any):api.Api {
+    return new api.Api(root);
   }
 }
 
