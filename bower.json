@@ -1,0 +1,18 @@
+{
+  "name": "webc-utils",
+  "version": "0.1.0",
+  "main": "dist/webs-utils.js",
+  "ignore": [
+    "Gruntfile.js",
+    "LICENSE-MIT",
+    "README.md",
+    "bower.json",
+    "demo/**/*",
+    "package.json",
+    "src/**/*",
+    ".bowerrc",
+    ".git",
+    ".gitignore",
+    ".gruntExt.js"
+  ]
+}

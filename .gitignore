@@ -1,0 +1,11 @@
+node_modules
+.baseDir*
+dist/webc
+demo/js/lib
+*.js.map
+.tscache
+.idea
+bower_components
+.DS_Store
+build
+.sass-cache
