@@ -62,7 +62,7 @@ module.exports = function (grunt) {
             }
         }
     });
-    ext.registerTask('_dev', ['components', 'watch']);
+    ext.registerTask('_dev', ['watch']);
 
     // Tasks
     ext.initConfig(grunt);
