@@ -10,19 +10,20 @@ module.exports = function (grunt) {
             dist: 'dist/webc-utils.js'
         },
         clean: {
-            src: ['dist/*]
+            src: ['dist/*']
         }
     });
 
     // Library
     ext.configure({
-        ts: {
+        typescript: {
             lib: {
                 src: ['<%= path.src %>/**/*.ts'],
-                outDir: '<%= path.tmp %>',
+                dest: '<%= path.tmp %>',
                 options: {
                     module: 'commonjs',
                     target: 'es3',
+                    basePath: '',
                     sourceMaps: true,
                     declaration: true,
                     removeComments: false
@@ -47,7 +48,7 @@ module.exports = function (grunt) {
             }
         }
     });
-    ext.registerTask('_lib', ['ts:lib', 'nodeunit:lib', 'browserify:lib', 'uglify:lib']);
+    ext.registerTask('_lib', ['typescript:lib', 'nodeunit:lib', 'browserify:lib', 'uglify:lib']);
 
     // Dev
     ext.configure({

@@ -1,6 +1,6 @@
 node_modules
 .baseDir*
-dist/webc
+dist/webc-utils/*
 demo/js/lib
 *.js.map
 .tscache
