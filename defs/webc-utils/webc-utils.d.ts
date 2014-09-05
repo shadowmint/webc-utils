@@ -5,10 +5,10 @@ declare module WEBC_UTILS {
   export class Api {
     public root: any;
     constructor(root: any);
-    public innerJson(): any;
-    public innerHtml(shadowDom?: boolean): string;
-    public getElements(tag: string, filter?: string, value?: string): any;
-    public getElement(tag: string, filter?: string, value?: string): any;
+    public json(): any;
+    public html(content?: string, shadowDom?: boolean): string;
+    public elements(tag: string, filter?: string, value?: string): any;
+    public element(tag: string, filter?: string, value?: string): any;
   }
 }
 

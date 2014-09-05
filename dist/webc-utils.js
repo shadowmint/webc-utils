@@ -3,8 +3,8 @@ var Api = (function () {
     function Api(root) {
         this.root = root;
     }
-    Api.prototype.innerJson = function () {
-        var raw = this.innerHtml();
+    Api.prototype.json = function () {
+        var raw = this.html();
         try  {
             return JSON.parse(raw);
         } catch (e) {
@@ -15,12 +15,18 @@ var Api = (function () {
         return {};
     };
 
-    Api.prototype.innerHtml = function (shadowDom) {
+    Api.prototype.html = function (content, shadowDom) {
+        if (typeof content === "undefined") { content = null; }
         if (typeof shadowDom === "undefined") { shadowDom = false; }
-        return shadowDom ? this.root.shadowRoot.innerHTML : this.root.innerHTML;
+        var root = shadowDom ? this.root.shadowRoot : this.root;
+        if (content) {
+            root.innerHTML = content;
+            return content;
+        }
+        return root.innerHTML;
     };
 
-    Api.prototype.getElements = function (tag, filter, value) {
+    Api.prototype.elements = function (tag, filter, value) {
         if (typeof filter === "undefined") { filter = null; }
         if (typeof value === "undefined") { value = null; }
         console.log(this.root);
@@ -54,10 +60,10 @@ var Api = (function () {
         return matches;
     };
 
-    Api.prototype.getElement = function (tag, filter, value) {
+    Api.prototype.element = function (tag, filter, value) {
         if (typeof filter === "undefined") { filter = null; }
         if (typeof value === "undefined") { value = null; }
-        var rtn = this.getElements(tag, filter, value);
+        var rtn = this.elements(tag, filter, value);
         return rtn.length ? rtn[0] : null;
     };
     return Api;
@@ -68,10 +74,22 @@ exports.Api = Api;
 var api = require('./api');
 
 (function (webc_utils) {
+    webc_utils.debug = true;
+
     function $(root) {
         return new api.Api(root);
     }
     webc_utils.$ = $;
+
+    function log(msg) {
+        try  {
+            if (webc_utils.debug) {
+                console.log(msg);
+            }
+        } catch (e) {
+        }
+    }
+    webc_utils.log = log;
 })(exports.webc_utils || (exports.webc_utils = {}));
 var webc_utils = exports.webc_utils;
 

@@ -11,8 +11,8 @@ export class Api {
    * Parse inner content as json and return as an object
    * This is for parsing the content of a node before it is populated.
    */
-  public innerJson():any {
-    var raw = this.innerHtml();
+  public json():any {
+    var raw = this.html();
     try {
       return JSON.parse(raw);
     } catch(e) {
@@ -27,8 +27,13 @@ export class Api {
    * Return inner html of root
    * @param shadowDom If true, return shadow dom content instead.
    */
-  public innerHtml(shadowDom:boolean = false):string {
-    return shadowDom ? this.root.shadowRoot.innerHTML : this.root.innerHTML;
+  public html(content:string = null, shadowDom:boolean = false):string {
+    var root = shadowDom ? this.root.shadowRoot : this.root;
+    if (content) {
+      root.innerHTML = content;
+      return content;
+    }
+    return root.innerHTML;
   }
 
   /**
@@ -37,7 +42,7 @@ export class Api {
    * @param filter The property to filter by, if any.
    * @param value Return only nodes which match filter and value if provided.
    */
-  public getElements(tag:string, filter:string = null, value:string = null):any {
+  public elements(tag:string, filter:string = null, value:string = null):any {
     console.log(this.root);
     var query = (this.root.shadowRoot != null) && (this.root.shadowRoot.children.length > 0) ? this.root.shadowRoot : this.root;
     console.log(query);
@@ -72,8 +77,8 @@ export class Api {
 
 
   /** Returns the first match from getElements or null */
-  public getElement(tag:string, filter:string = null, value:string = null):any {
-    var rtn = this.getElements(tag, filter, value);
+  public element(tag:string, filter:string = null, value:string = null):any {
+    var rtn = this.elements(tag, filter, value);
     return rtn.length ? rtn[0] : null;
   }
 }
