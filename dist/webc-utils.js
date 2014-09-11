@@ -66,6 +66,10 @@ var Api = (function () {
         var rtn = this.elements(tag, filter, value);
         return rtn.length ? rtn[0] : null;
     };
+
+    Api.prototype.parent = function () {
+        return new Api(this.root.parentNode);
+    };
     return Api;
 })();
 exports.Api = Api;

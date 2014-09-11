@@ -1,6 +1,7 @@
 declare module WEBC_UTILS {
 
   export function $(root: any): Api;
+  export function log(value: any): void;
 
   export class Api {
     public root: any;
@@ -9,6 +10,7 @@ declare module WEBC_UTILS {
     public html(content?: string, shadowDom?: boolean): string;
     public elements(tag: string, filter?: string, value?: string): any;
     public element(tag: string, filter?: string, value?: string): any;
+    public parent(): Api;
   }
 }
 

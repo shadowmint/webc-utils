@@ -81,4 +81,9 @@ export class Api {
     var rtn = this.elements(tag, filter, value);
     return rtn.length ? rtn[0] : null;
   }
+
+  /** Return the parent node of the element as an api reference, escaping shadow dom box */
+  public parent():Api {
+    return new Api(this.root.parentNode);
+  }
 }
