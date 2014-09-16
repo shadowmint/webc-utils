@@ -15,6 +15,14 @@ var Api = (function () {
         return {};
     };
 
+    Api.prototype.append = function (content, type) {
+        if (typeof content === "undefined") { content = ''; }
+        if (typeof type === "undefined") { type = 'span'; }
+        var node = document.createElement(type);
+        node.innerHTML = content;
+        this.root.appendChild(node);
+    };
+
     Api.prototype.html = function (content, shadowDom) {
         if (typeof content === "undefined") { content = null; }
         if (typeof shadowDom === "undefined") { shadowDom = false; }
@@ -29,22 +37,14 @@ var Api = (function () {
     Api.prototype.elements = function (tag, filter, value) {
         if (typeof filter === "undefined") { filter = null; }
         if (typeof value === "undefined") { value = null; }
-        console.log(this.root);
         var query = (this.root.shadowRoot != null) && (this.root.shadowRoot.children.length > 0) ? this.root.shadowRoot : this.root;
-        console.log(query);
-        console.log(query.innerHTML);
-        console.log(tag);
         var matches = query.getElementsByTagName(tag);
-        console.log(matches);
-        console.log(filter + " -- " + value);
         if (filter && value) {
             var rtn = [];
             if (filter.indexOf('data-') == 0) {
-                console.log("Data query!");
                 var key = filter.split('data-')[1];
                 for (var i = 0; i < matches.length; ++i) {
                     if (matches[i].dataset[key] && (matches[i].dataset[key] == value)) {
-                        console.log("Match for value: " + matches[i].dataset);
                         rtn.push(matches[i]);
                     }
                 }

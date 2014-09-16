@@ -8,6 +8,7 @@ declare module WEBC_UTILS {
     constructor(root: any);
     public json(): any;
     public html(content?: string, shadowDom?: boolean): string;
+    public append(content?: string, type?: string): void;
     public elements(tag: string, filter?: string, value?: string): any;
     public element(tag: string, filter?: string, value?: string): any;
     public parent(): Api;

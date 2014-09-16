@@ -24,6 +24,17 @@ export class Api {
   }
 
   /**
+   * Append to the given element a new element of the given type.
+   * @param content The inner content.
+   * @param type The type to create.
+   */
+  public append(content:string = '', type:string = 'span'):void {
+    var node = document.createElement(type);
+    node.innerHTML = content;
+    this.root.appendChild(node);
+  }
+
+  /**
    * Return inner html of root
    * @param shadowDom If true, return shadow dom content instead.
    */
@@ -43,22 +54,14 @@ export class Api {
    * @param value Return only nodes which match filter and value if provided.
    */
   public elements(tag:string, filter:string = null, value:string = null):any {
-    console.log(this.root);
     var query = (this.root.shadowRoot != null) && (this.root.shadowRoot.children.length > 0) ? this.root.shadowRoot : this.root;
-    console.log(query);
-    console.log(query.innerHTML);
-    console.log(tag);
     var matches:any[] = query.getElementsByTagName(tag);
-    console.log(matches);
-    console.log(filter + " -- " + value);
     if (filter && value) {
       var rtn:any[] = [];
       if (filter.indexOf('data-') == 0) {
-        console.log("Data query!");
         var key = filter.split('data-')[1];
         for (var i = 0; i < matches.length; ++i) {
           if (matches[i].dataset[key] && (matches[i].dataset[key] == value)) {
-            console.log("Match for value: " + matches[i].dataset);
             rtn.push(matches[i]);
           }
         }
@@ -74,7 +77,6 @@ export class Api {
     }
     return matches;
   }
-
 
   /** Returns the first match from getElements or null */
   public element(tag:string, filter:string = null, value:string = null):any {
