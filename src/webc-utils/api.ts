@@ -8,29 +8,16 @@ export class Api {
   }
 
   /**
-   * Parse inner content as json and return as an object
-   * This is for parsing the content of a node before it is populated.
-   */
-  public json():any {
-    var raw = this.html();
-    try {
-      return JSON.parse(raw);
-    } catch(e) {
-      console.log("Failed");
-      console.log(e);
-      console.log(raw);
-    }
-    return {};
-  }
-
-  /**
    * Append to the given element a new element of the given type.
    * @param content The inner content.
    * @param type The type to create.
    */
-  public append(content:string = '', type:string = 'span'):void {
+  public append(content:any = '', type:string = 'span'):void {
     var node = document.createElement(type);
-    node.innerHTML = content;
+    if (typeof(content) == 'string') {
+      content = document.createTextNode(content);
+    }
+    node.appendChild(content);
     this.root.appendChild(node);
   }
 
@@ -66,6 +53,13 @@ export class Api {
           }
         }
       }
+      else if (filter == "class") {
+        for (var i = 0; i < matches.length; ++i) {
+          if (new Api(matches[i]).hasClass(value)) {
+            rtn.push(matches[i]);
+          }
+        }
+      }
       else {
         for (var i = 0; i < matches.length; ++i) {
           if (matches[i][filter] && (matches[i][filter] == value)) {
@@ -87,5 +81,32 @@ export class Api {
   /** Return the parent node of the element as an api reference, escaping shadow dom box */
   public parent():Api {
     return new Api(this.root.parentNode);
+  }
+
+  /** List of classes on target */
+  public classes():string[] {
+    if (!this.root.className) { return []; }
+    return this.root.className.split(' ').filter((f) => { return f != ""; });
+  }
+
+  /** Has a class? */
+  public hasClass(value:string):boolean {
+    return this.classes().filter((f) => { return f == value; }).length > 0;
+  }
+
+  /** Add a class */
+  public addClass(value:string):void {
+    console.log('add: ' + value);
+    if (!this.hasClass(value)) {
+      this.root.className += " " + value;
+    }
+    console.log(this.root);
+  }
+
+  /** Remove a class */
+  public removeClass(value:string):void {
+    console.log('remove: ' + value);
+    this.root.className = this.classes().filter((f) => { return f != value; }).join(" ");
+    console.log(this.root);
   }
 }

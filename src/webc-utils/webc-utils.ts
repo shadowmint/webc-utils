@@ -20,6 +20,11 @@ export module webc_utils {
     catch(e) {
     }
   }
+    
+  /** Run something async */
+  export function async(callback) {
+    setTimeout(callback, 1);
+  };
 }
 
 // Export module

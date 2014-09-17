@@ -3,23 +3,14 @@ var Api = (function () {
     function Api(root) {
         this.root = root;
     }
-    Api.prototype.json = function () {
-        var raw = this.html();
-        try  {
-            return JSON.parse(raw);
-        } catch (e) {
-            console.log("Failed");
-            console.log(e);
-            console.log(raw);
-        }
-        return {};
-    };
-
     Api.prototype.append = function (content, type) {
         if (typeof content === "undefined") { content = ''; }
         if (typeof type === "undefined") { type = 'span'; }
         var node = document.createElement(type);
-        node.innerHTML = content;
+        if (typeof (content) == 'string') {
+            content = document.createTextNode(content);
+        }
+        node.appendChild(content);
         this.root.appendChild(node);
     };
 
@@ -48,6 +39,12 @@ var Api = (function () {
                         rtn.push(matches[i]);
                     }
                 }
+            } else if (filter == "class") {
+                for (var i = 0; i < matches.length; ++i) {
+                    if (new Api(matches[i]).hasClass(value)) {
+                        rtn.push(matches[i]);
+                    }
+                }
             } else {
                 for (var i = 0; i < matches.length; ++i) {
                     if (matches[i][filter] && (matches[i][filter] == value)) {
@@ -69,6 +66,37 @@ var Api = (function () {
 
     Api.prototype.parent = function () {
         return new Api(this.root.parentNode);
+    };
+
+    Api.prototype.classes = function () {
+        if (!this.root.className) {
+            return [];
+        }
+        return this.root.className.split(' ').filter(function (f) {
+            return f != "";
+        });
+    };
+
+    Api.prototype.hasClass = function (value) {
+        return this.classes().filter(function (f) {
+            return f == value;
+        }).length > 0;
+    };
+
+    Api.prototype.addClass = function (value) {
+        console.log('add: ' + value);
+        if (!this.hasClass(value)) {
+            this.root.className += " " + value;
+        }
+        console.log(this.root);
+    };
+
+    Api.prototype.removeClass = function (value) {
+        console.log('remove: ' + value);
+        this.root.className = this.classes().filter(function (f) {
+            return f != value;
+        }).join(" ");
+        console.log(this.root);
     };
     return Api;
 })();
@@ -94,6 +122,12 @@ var api = require('./api');
         }
     }
     webc_utils.log = log;
+
+    function async(callback) {
+        setTimeout(callback, 1);
+    }
+    webc_utils.async = async;
+    ;
 })(exports.webc_utils || (exports.webc_utils = {}));
 var webc_utils = exports.webc_utils;
 
