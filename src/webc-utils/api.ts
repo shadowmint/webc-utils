@@ -72,6 +72,25 @@ export class Api {
     return matches;
   }
 
+  /** Get an attribute value */
+  public attr(tag:string):any {
+    if (tag.indexOf('data-') == 0) {
+      var key = tag.split('data-')[1];
+      return this.root.dataset[key];
+    }
+    if (this.root[tag]) {
+      return this.root[tag];
+    }
+    else {
+      try {
+        return this.root.getAttribute(tag);
+      }
+      catch(err) {
+      }
+    }
+    return null;
+  }
+
   /** Returns the first match from getElements or null */
   public element(tag:string, filter:string = null, value:string = null):any {
     var rtn = this.elements(tag, filter, value);

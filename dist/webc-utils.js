@@ -57,6 +57,22 @@ var Api = (function () {
         return matches;
     };
 
+    Api.prototype.attr = function (tag) {
+        if (tag.indexOf('data-') == 0) {
+            var key = tag.split('data-')[1];
+            return this.root.dataset[key];
+        }
+        if (this.root[tag]) {
+            return this.root[tag];
+        } else {
+            try  {
+                return this.root.getAttribute(tag);
+            } catch (err) {
+            }
+        }
+        return null;
+    };
+
     Api.prototype.element = function (tag, filter, value) {
         if (typeof filter === "undefined") { filter = null; }
         if (typeof value === "undefined") { value = null; }

@@ -7,6 +7,7 @@ declare module WEBC_UTILS {
   export class Api {
     public root: any;
     constructor(root: any);
+    public attr(tag: string): any;
     public html(content?: string, shadowDom?: boolean): string;
     public append(content?: string, type?: string): void;
     public elements(tag: string, filter?: string, value?: string): any;
