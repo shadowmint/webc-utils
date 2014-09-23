@@ -14,6 +14,10 @@ var Api = (function () {
         this.root.appendChild(node);
     };
 
+    Api.prototype.remove = function (node) {
+        this.root.removeChild(node);
+    };
+
     Api.prototype.html = function (content, shadowDom) {
         if (typeof content === "undefined") { content = null; }
         if (typeof shadowDom === "undefined") { shadowDom = false; }
@@ -30,8 +34,8 @@ var Api = (function () {
         if (typeof value === "undefined") { value = null; }
         var query = (this.root.shadowRoot != null) && (this.root.shadowRoot.children.length > 0) ? this.root.shadowRoot : this.root;
         var matches = query.getElementsByTagName(tag);
+        var rtn = [];
         if (filter && value) {
-            var rtn = [];
             if (filter.indexOf('data-') == 0) {
                 var key = filter.split('data-')[1];
                 for (var i = 0; i < matches.length; ++i) {
@@ -52,9 +56,12 @@ var Api = (function () {
                     }
                 }
             }
-            matches = rtn;
+        } else {
+            for (var i = 0; i < matches.length; ++i) {
+                rtn.push(matches[i]);
+            }
         }
-        return matches;
+        return rtn;
     };
 
     Api.prototype.attr = function (tag) {
@@ -125,7 +132,7 @@ var api = require('./api');
     webc_utils.debug = true;
 
     function $(root) {
-        return new api.Api(root);
+        return root.root ? root : new api.Api(root);
     }
     webc_utils.$ = $;
 

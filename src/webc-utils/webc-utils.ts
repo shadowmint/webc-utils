@@ -7,7 +7,7 @@ export module webc_utils {
 
   /** Generate a new api for the given element */
   export function $(root:any):api.Api {
-    return new api.Api(root);
+    return root.root ? root : new api.Api(root);
   }
 
   /** Trace a message, if debugging is enabled */
@@ -20,7 +20,7 @@ export module webc_utils {
     catch(e) {
     }
   }
-    
+
   /** Run something async */
   export function async(callback) {
     setTimeout(callback, 1);

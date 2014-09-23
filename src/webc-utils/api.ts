@@ -22,6 +22,14 @@ export class Api {
   }
 
   /**
+   * Remove the element from the given target
+   * @param content The node.
+   */
+  public remove(node:any):void {
+    this.root.removeChild(node);
+  }
+
+  /**
    * Return inner html of root
    * @param shadowDom If true, return shadow dom content instead.
    */
@@ -43,8 +51,8 @@ export class Api {
   public elements(tag:string, filter:string = null, value:string = null):any {
     var query = (this.root.shadowRoot != null) && (this.root.shadowRoot.children.length > 0) ? this.root.shadowRoot : this.root;
     var matches:any[] = query.getElementsByTagName(tag);
+    var rtn:any[] = [];
     if (filter && value) {
-      var rtn:any[] = [];
       if (filter.indexOf('data-') == 0) {
         var key = filter.split('data-')[1];
         for (var i = 0; i < matches.length; ++i) {
@@ -67,9 +75,13 @@ export class Api {
           }
         }
       }
-      matches = rtn;
     }
-    return matches;
+    else {
+      for (var i = 0; i < matches.length; ++i) {
+        rtn.push(matches[i]);
+      }
+    }
+    return rtn;
   }
 
   /** Get an attribute value */
