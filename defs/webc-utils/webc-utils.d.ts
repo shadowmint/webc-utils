@@ -1,17 +1,20 @@
 declare module WEBC_UTILS {
 
   export function $(root: any): Api;
+  export function $s(root: any): Api;
   export function log(value: any): void;
   export function async(callback: any): void;
 
   export class Api {
     public root: any;
+    private _shadow;
     constructor(root: any);
-    public attr(tag: string): any;
-    public html(content?: string, shadowDom?: boolean): string;
-    public append(content?: string, type?: string): void;
-    public remove(node: any): void;
+    public shadow(value?: boolean): Api;
+    public append(content?: any, type?: string): void;
+    public remove(): void;
+    public html(content?: string): string;
     public elements(tag: string, filter?: string, value?: string): any;
+    public attr(tag: string): any;
     public element(tag: string, filter?: string, value?: string): any;
     public parent(): Api;
     public classes(): string[];

@@ -2,26 +2,40 @@
 var Api = (function () {
     function Api(root) {
         this.root = root;
+        this._shadow = false;
     }
+    Api.prototype.shadow = function (value) {
+        if (typeof value === "undefined") { value = true; }
+        this._shadow = value;
+        return this;
+    };
+
     Api.prototype.append = function (content, type) {
         if (typeof content === "undefined") { content = ''; }
         if (typeof type === "undefined") { type = 'span'; }
-        var node = document.createElement(type);
         if (typeof (content) == 'string') {
+            var node = document.createElement(type);
             content = document.createTextNode(content);
+            node.appendChild(content);
+            content = node;
         }
-        node.appendChild(content);
-        this.root.appendChild(node);
+        if (this._shadow) {
+            this.root.shadowRoot.appendChild(content);
+        } else {
+            this.root.appendChild(content);
+        }
     };
 
-    Api.prototype.remove = function (node) {
-        this.root.removeChild(node);
+    Api.prototype.remove = function () {
+        try  {
+            this.root.parentNode.removeChild(this.root);
+        } catch (e) {
+        }
     };
 
-    Api.prototype.html = function (content, shadowDom) {
+    Api.prototype.html = function (content) {
         if (typeof content === "undefined") { content = null; }
-        if (typeof shadowDom === "undefined") { shadowDom = false; }
-        var root = shadowDom ? this.root.shadowRoot : this.root;
+        var root = this._shadow ? this.root.shadowRoot : this.root;
         if (content) {
             root.innerHTML = content;
             return content;
@@ -32,7 +46,7 @@ var Api = (function () {
     Api.prototype.elements = function (tag, filter, value) {
         if (typeof filter === "undefined") { filter = null; }
         if (typeof value === "undefined") { value = null; }
-        var query = (this.root.shadowRoot != null) && (this.root.shadowRoot.children.length > 0) ? this.root.shadowRoot : this.root;
+        var query = this._shadow ? this.root.shadowRoot : this.root;
         var matches = query.getElementsByTagName(tag);
         var rtn = [];
         if (filter && value) {
@@ -40,28 +54,35 @@ var Api = (function () {
                 var key = filter.split('data-')[1];
                 for (var i = 0; i < matches.length; ++i) {
                     if (matches[i].dataset[key] && (matches[i].dataset[key] == value)) {
-                        rtn.push(matches[i]);
+                        rtn.push(new Api(matches[i]));
                     }
                 }
             } else if (filter == "class") {
                 for (var i = 0; i < matches.length; ++i) {
                     if (new Api(matches[i]).hasClass(value)) {
-                        rtn.push(matches[i]);
+                        rtn.push(new Api(matches[i]));
                     }
                 }
             } else {
                 for (var i = 0; i < matches.length; ++i) {
                     if (matches[i][filter] && (matches[i][filter] == value)) {
-                        rtn.push(matches[i]);
+                        rtn.push(new Api(matches[i]));
                     }
                 }
             }
         } else {
             for (var i = 0; i < matches.length; ++i) {
-                rtn.push(matches[i]);
+                rtn.push(new Api(matches[i]));
             }
         }
         return rtn;
+    };
+
+    Api.prototype.element = function (tag, filter, value) {
+        if (typeof filter === "undefined") { filter = null; }
+        if (typeof value === "undefined") { value = null; }
+        var rtn = this.elements(tag, filter, value);
+        return rtn.length ? rtn[0] : null;
     };
 
     Api.prototype.attr = function (tag) {
@@ -80,15 +101,11 @@ var Api = (function () {
         return null;
     };
 
-    Api.prototype.element = function (tag, filter, value) {
-        if (typeof filter === "undefined") { filter = null; }
-        if (typeof value === "undefined") { value = null; }
-        var rtn = this.elements(tag, filter, value);
-        return rtn.length ? rtn[0] : null;
-    };
-
     Api.prototype.parent = function () {
-        return new Api(this.root.parentNode);
+        if (this._shadow) {
+            return new Api(this.root.parentNode);
+        }
+        return new Api(this.root.parent);
     };
 
     Api.prototype.classes = function () {
@@ -107,7 +124,6 @@ var Api = (function () {
     };
 
     Api.prototype.addClass = function (value) {
-        console.log('add: ' + value);
         if (!this.hasClass(value)) {
             this.root.className += " " + value;
         }
@@ -115,7 +131,6 @@ var Api = (function () {
     };
 
     Api.prototype.removeClass = function (value) {
-        console.log('remove: ' + value);
         this.root.className = this.classes().filter(function (f) {
             return f != value;
         }).join(" ");
@@ -132,9 +147,16 @@ var api = require('./api');
     webc_utils.debug = true;
 
     function $(root) {
-        return root.root ? root : new api.Api(root);
+        return root && root.root ? root : new api.Api(root);
     }
     webc_utils.$ = $;
+
+    function $s(root) {
+        var rtn = $(root);
+        rtn.shadow(true);
+        return rtn;
+    }
+    webc_utils.$s = $s;
 
     function log(msg) {
         try  {

@@ -3,8 +3,18 @@ export class Api {
   /** Root element this api is operating on */
   public root:any;
 
+  /** Are we talking to the shadow dom */
+  private _shadow:boolean;
+
   constructor(root:any) {
     this.root = root;
+    this._shadow = false;
+  }
+
+  /** Set the shadow dom state */
+  public shadow(value:boolean = true):Api {
+    this._shadow = value;
+    return this;
   }
 
   /**
@@ -13,28 +23,35 @@ export class Api {
    * @param type The type to create.
    */
   public append(content:any = '', type:string = 'span'):void {
-    var node = document.createElement(type);
     if (typeof(content) == 'string') {
+      var node = document.createElement(type);
       content = document.createTextNode(content);
+      node.appendChild(content);
+      content = node;
     }
-    node.appendChild(content);
-    this.root.appendChild(node);
+    if (this._shadow) {
+      this.root.shadowRoot.appendChild(content);
+    }
+    else {
+      this.root.appendChild(content);
+    }
   }
 
-  /**
-   * Remove the element from the given target
-   * @param content The node.
-   */
-  public remove(node:any):void {
-    this.root.removeChild(node);
+  /** Remove the element the tree */
+  public remove():void {
+    try {
+      this.root.parentNode.removeChild(this.root);
+    }
+    catch(e) {
+    }
   }
 
   /**
    * Return inner html of root
    * @param shadowDom If true, return shadow dom content instead.
    */
-  public html(content:string = null, shadowDom:boolean = false):string {
-    var root = shadowDom ? this.root.shadowRoot : this.root;
+  public html(content:string = null):string {
+    var root = this._shadow ? this.root.shadowRoot : this.root;
     if (content) {
       root.innerHTML = content;
       return content;
@@ -48,8 +65,8 @@ export class Api {
    * @param filter The property to filter by, if any.
    * @param value Return only nodes which match filter and value if provided.
    */
-  public elements(tag:string, filter:string = null, value:string = null):any {
-    var query = (this.root.shadowRoot != null) && (this.root.shadowRoot.children.length > 0) ? this.root.shadowRoot : this.root;
+  public elements(tag:string, filter:string = null, value:string = null):Api[] {
+    var query = this._shadow ? this.root.shadowRoot : this.root;
     var matches:any[] = query.getElementsByTagName(tag);
     var rtn:any[] = [];
     if (filter && value) {
@@ -57,31 +74,37 @@ export class Api {
         var key = filter.split('data-')[1];
         for (var i = 0; i < matches.length; ++i) {
           if (matches[i].dataset[key] && (matches[i].dataset[key] == value)) {
-            rtn.push(matches[i]);
+            rtn.push(new Api(matches[i]));
           }
         }
       }
       else if (filter == "class") {
         for (var i = 0; i < matches.length; ++i) {
           if (new Api(matches[i]).hasClass(value)) {
-            rtn.push(matches[i]);
+            rtn.push(new Api(matches[i]));
           }
         }
       }
       else {
         for (var i = 0; i < matches.length; ++i) {
           if (matches[i][filter] && (matches[i][filter] == value)) {
-            rtn.push(matches[i]);
+            rtn.push(new Api(matches[i]));
           }
         }
       }
     }
     else {
       for (var i = 0; i < matches.length; ++i) {
-        rtn.push(matches[i]);
+        rtn.push(new Api(matches[i]));
       }
     }
     return rtn;
+  }
+
+  /** Returns the first match from getElements or null */
+  public element(tag:string, filter:string = null, value:string = null):any {
+    var rtn = this.elements(tag, filter, value);
+    return rtn.length ? rtn[0] : null;
   }
 
   /** Get an attribute value */
@@ -103,15 +126,12 @@ export class Api {
     return null;
   }
 
-  /** Returns the first match from getElements or null */
-  public element(tag:string, filter:string = null, value:string = null):any {
-    var rtn = this.elements(tag, filter, value);
-    return rtn.length ? rtn[0] : null;
-  }
-
-  /** Return the parent node of the element as an api reference, escaping shadow dom box */
+  /** Return the parent node of the element as an api reference */
   public parent():Api {
-    return new Api(this.root.parentNode);
+    if (this._shadow) {
+      return new Api(this.root.parentNode);
+    }
+    return new Api(this.root.parent);
   }
 
   /** List of classes on target */
@@ -127,7 +147,6 @@ export class Api {
 
   /** Add a class */
   public addClass(value:string):void {
-    console.log('add: ' + value);
     if (!this.hasClass(value)) {
       this.root.className += " " + value;
     }
@@ -136,7 +155,6 @@ export class Api {
 
   /** Remove a class */
   public removeClass(value:string):void {
-    console.log('remove: ' + value);
     this.root.className = this.classes().filter((f) => { return f != value; }).join(" ");
     console.log(this.root);
   }

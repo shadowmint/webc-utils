@@ -7,7 +7,14 @@ export module webc_utils {
 
   /** Generate a new api for the given element */
   export function $(root:any):api.Api {
-    return root.root ? root : new api.Api(root);
+    return root && root.root ? root : new api.Api(root);
+  }
+
+  /** Generate a new api for the given element's shadow dom */
+  export function $s(root:any):api.Api {
+    var rtn = $(root);
+    rtn.shadow(true);
+    return rtn;
   }
 
   /** Trace a message, if debugging is enabled */
