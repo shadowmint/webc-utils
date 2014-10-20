@@ -3,6 +3,7 @@ declare module WEBC_UTILS {
   export function $(root: any): Api;
   export function $s(root: any): Api;
   export function log(value: any): void;
+  export function uuid(): string;
   export function async(callback: any): void;
 
   export class Api {

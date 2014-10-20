@@ -3,7 +3,15 @@ var Api = (function () {
     function Api(root) {
         this.root = root;
         this._shadow = false;
+        this.__uuid = Api.uuid;
     }
+    Api.prototype.isApi = function (target) {
+        if (target && target.__uuid) {
+            return target.__uuid === Api.uuid;
+        }
+        return false;
+    };
+
     Api.prototype.shadow = function (value) {
         if (typeof value === "undefined") { value = true; }
         this._shadow = value;
@@ -13,11 +21,15 @@ var Api = (function () {
     Api.prototype.append = function (content, type) {
         if (typeof content === "undefined") { content = ''; }
         if (typeof type === "undefined") { type = 'span'; }
+        if (this.root == null)
+            return;
         if (typeof (content) == 'string') {
             var node = document.createElement(type);
             content = document.createTextNode(content);
             node.appendChild(content);
             content = node;
+        } else if (this.isApi(content)) {
+            content = content.root;
         }
         if (this._shadow) {
             this.root.shadowRoot.appendChild(content);
@@ -27,6 +39,8 @@ var Api = (function () {
     };
 
     Api.prototype.remove = function () {
+        if (this.root == null)
+            return;
         try  {
             this.root.parentNode.removeChild(this.root);
         } catch (e) {
@@ -35,6 +49,8 @@ var Api = (function () {
 
     Api.prototype.html = function (content) {
         if (typeof content === "undefined") { content = null; }
+        if (this.root == null)
+            return '';
         var root = this._shadow ? this.root.shadowRoot : this.root;
         if (content) {
             root.innerHTML = content;
@@ -46,6 +62,8 @@ var Api = (function () {
     Api.prototype.elements = function (tag, filter, value) {
         if (typeof filter === "undefined") { filter = null; }
         if (typeof value === "undefined") { value = null; }
+        if (this.root == null)
+            return [];
         var query = this._shadow ? this.root.shadowRoot : this.root;
         var matches = query.getElementsByTagName(tag);
         var rtn = [];
@@ -86,6 +104,8 @@ var Api = (function () {
     };
 
     Api.prototype.attr = function (tag) {
+        if (this.root == null)
+            return null;
         if (tag.indexOf('data-') == 0) {
             var key = tag.split('data-')[1];
             return this.root.dataset[key];
@@ -102,13 +122,20 @@ var Api = (function () {
     };
 
     Api.prototype.parent = function () {
-        if (this._shadow) {
-            return new Api(this.root.parentNode);
+        try  {
+            if (this._shadow) {
+                return new Api(this.root.parentNode);
+            }
+            return new Api(this.root.parent);
+        } catch (e) {
+            console.log("warning: " + this.root + " does not have a parent node");
+            return new Api(null);
         }
-        return new Api(this.root.parent);
     };
 
     Api.prototype.classes = function () {
+        if (this.root == null)
+            return [];
         if (!this.root.className) {
             return [];
         }
@@ -118,12 +145,16 @@ var Api = (function () {
     };
 
     Api.prototype.hasClass = function (value) {
+        if (this.root == null)
+            return false;
         return this.classes().filter(function (f) {
             return f == value;
         }).length > 0;
     };
 
     Api.prototype.addClass = function (value) {
+        if (this.root == null)
+            return;
         if (!this.hasClass(value)) {
             this.root.className += " " + value;
         }
@@ -131,11 +162,14 @@ var Api = (function () {
     };
 
     Api.prototype.removeClass = function (value) {
+        if (this.root == null)
+            return;
         this.root.className = this.classes().filter(function (f) {
             return f != value;
         }).join(" ");
         console.log(this.root);
     };
+    Api.uuid = "";
     return Api;
 })();
 exports.Api = Api;
@@ -173,6 +207,17 @@ var api = require('./api');
     }
     webc_utils.async = async;
     ;
+
+    function uuid() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
+    webc_utils.uuid = uuid;
+    ;
+
+    api.Api.uuid = uuid();
 })(exports.webc_utils || (exports.webc_utils = {}));
 var webc_utils = exports.webc_utils;
 

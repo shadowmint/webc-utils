@@ -32,6 +32,17 @@ export module webc_utils {
   export function async(callback) {
     setTimeout(callback, 1);
   };
+
+  /** Surprisingly useful helper to generate a uuid */
+  export function uuid():string {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+      return v.toString(16);
+    });
+  };
+
+  // Generate a uuid for the module
+  api.Api.uuid = uuid();
 }
 
 // Export module
